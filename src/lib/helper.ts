@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import originTsConfig from '../tsconfigOrigin.json'
 import { exec } from 'child_process'
-import type { PluginScriptPaths, PluginScriptPathsConfig } from '#/index'
+import type { PluginScriptPaths, PluginScriptPathsConfig } from '../types/index'
 
 interface VConsole {
   keepLog: boolean
@@ -50,7 +50,7 @@ export const getCompileDirAllDirPaths = (compileDirPath: string) => {
     fs
       .readdirSync(dirPath)
       .forEach((file) => {
-        let fullPath = path.join(dirPath, file)
+        const fullPath = path.join(dirPath, file)
         if (fs.lstatSync(fullPath).isDirectory()) {
           dirPaths.push(path.relative(compileDirPath, fullPath))
           traverseDir(fullPath)
@@ -101,7 +101,7 @@ const updateTsConfig = (updateRecord: Record<string, any>) => {
     originTsConfig.include = include
 
     fs.writeFileSync(path.join(__dirname, './tsconfig.json'), JSON.stringify(originTsConfig, null, 2))
-    // fs.writeFileSync(path.join(__dirname, '../tsconfig.json'), JSON.stringify(originTsConfig, null, 2)) 本地开发环境
+    // fs.writeFileSync(path.join(__dirname, '../tsconfig.json'), JSON.stringify(originTsConfig, null, 2)) // 本地开发环境
   } catch (e: any) {
     console.error('[vite-plugin-globEager-auto-declare] 使用tsc编译失败, error: 读取tsconfig配置文件失败')
     throw new Error(e)

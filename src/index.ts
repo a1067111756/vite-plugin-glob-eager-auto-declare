@@ -1,7 +1,7 @@
 import path from 'path'
 import { generateMain } from './lib'
 import { parseScriptPathsConfig  } from './lib/helper'
-import type { PluginScriptPaths, PluginOutPath, PluginOptions, PluginScriptPathsConfig } from '#/index'
+import type { PluginScriptPaths, PluginOutPath, PluginOptions, PluginScriptPathsConfig } from './types/index'
 
 // 插件选项参数
 let gScriptPathConfigs: PluginScriptPathsConfig = []
@@ -43,7 +43,6 @@ export default function VitePluginGlobDeclare(scriptPaths: PluginScriptPaths, ou
         console.error('[vite-plugin-globEager-auto-declare] error: 编译目录为空, scriptOptions为空数组')
         return
       }
-
 
       // 目标文件变动，执行声明编译流程
       const watchFile = gScriptPathConfigs.map(item => path.normalize(item.path))

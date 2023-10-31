@@ -2,7 +2,7 @@
 import path from 'path'
 import { parseDeclare, writeCompileContents } from './parse'
 import { removeDir, execTscCommand, vconsole } from './helper'
-import {PluginOptions, PluginOutPath, PluginScriptPathsConfig} from '#/index'
+import {PluginOptions, PluginOutPath, PluginScriptPathsConfig} from '../types/index'
 
 // 全局属性 - 标记当前是否在编译进程中，目的时防止频繁触发
 let isCompiling = false
@@ -13,7 +13,7 @@ const COMPILE_DIR = path.join(__dirname, './compile')
 
 // prettierrc路径 - 样式格式化文件
 const PRETTIERRC_PATH = path.join(__dirname, './.prettierrc')
-// const COMPILE_DIR = path.join(__dirname, '../.prettierrc')  // 本地开发环境
+// const PRETTIERRC_PATH = path.join(__dirname, '../.prettierrc')  // 本地开发环境
 
 // 记录声明文件中引入的三方包(切记不用用相对路径引入，相对路径未处理)
 let importLibs: Array<string> = []

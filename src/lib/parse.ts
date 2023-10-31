@@ -4,12 +4,12 @@ import path from 'path'
 import chalk from 'chalk'
 import { execSync } from 'child_process'
 import { vconsole, getCompileDirAllDirPaths, parseScriptPathsConfig } from './helper'
-import type { PluginOutPath, PluginScriptPathsConfig } from '#/index'
-
-let targetDeclareDir = {}
+import type { PluginOutPath, PluginScriptPathsConfig } from '../types/index'
+``
+const targetDeclareDir = {}
 
 // 方法 - 替换声明文件内容
-const formatDeclare = (content: string, importLibs: Array<string>, importDeclare: Array<string>, fileName: string) => {
+const formatDeclare = (content: string, importLibs: Array<string>, importDeclare: Array<string>) => {
   let temp = ''
 
   // 处理声明文件中引入的三方包
@@ -136,7 +136,7 @@ const filterDeclareContent = (filePath: string, importLibs: Array<string>, impor
   // 1. 将文件名作为key, 2. 将内容中“export declare const”去除
   const fileName = filePath.slice(filePath.lastIndexOf('\\') + 1)
   const key = fileName.slice(0, -5)
-  const value = formatDeclare(content, importLibs, importDeclare, fileName)
+  const value = formatDeclare(content, importLibs, importDeclare)
   return `  ${key}: ${value.replace(/export\s*{\s*}\s*;/g, '')}`
 }
 
