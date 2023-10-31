@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-glob-eager-auto-declare",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "author": "chengyu",
   "license": "MIT",
   "description": "automatically generate a claims file, mounted into vue global instance variables",
@@ -16,7 +16,7 @@
   "files": [
     "dist"
   ],
-  "keywords": [],
+  "keywords": ["vite", "glob", "glob-eager", "declare"],
   "scripts": {
     "build": "rollup -c rollup.config.prod.mjs --bundleConfigAsCjs && node ./types-excutor.mjs",
     "ts:check": "tsc --noEmit -p ./tsconfig.json",
