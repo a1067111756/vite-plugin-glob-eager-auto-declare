@@ -1,6 +1,7 @@
 /* 工具类方法 */
 import fs from 'fs'
 import path from 'path'
+import originTsConfig from '../tsconfigOrigin.json'
 import { exec } from 'child_process'
 import type { PluginScriptPaths, PluginScriptPathsConfig } from '#/index'
 
@@ -41,32 +42,28 @@ export const removeDir = (dirPath: string) => {
   fs.rmdirSync(dirPath)
 }
 
-// 工具方法 - 匹配获取源路径相对目标路径除了公共部分外的剩余路径
-// eg: E://testProject//demo//src//api/dir、E://testProject//demo//build/compile -> //api/dir
-export const getExtraRelativePath = (sourcePath: string, destPath: string) => {
-  const declareFiles = fs.readdirSync(destPath)
-  const matchFileName = declareFiles.find(fileName => sourcePath.includes(fileName))
-  if (!matchFileName) return
+// 工具方法 - 遍历编译文件夹，获取嵌套文件夹中所有文件夹地址
+export const getCompileDirAllDirPaths = (compileDirPath: string) => {
+  const dirPaths: Array<string> = []
 
-  return `${destPath}\\${sourcePath.slice(sourcePath.lastIndexOf(matchFileName))}`
+  const traverseDir = (dirPath: string) => {
+    fs
+      .readdirSync(dirPath)
+      .forEach((file) => {
+        let fullPath = path.join(dirPath, file)
+        if (fs.lstatSync(fullPath).isDirectory()) {
+          dirPaths.push(path.relative(compileDirPath, fullPath))
+          traverseDir(fullPath)
+        }
+    })
+  }
 
-  // console.log('sourcePath:', sourcePath)
-  // console.log('destPath:', destPath)
-  //
-  // // 获取sourcePath相对于destPath的相对路径
-  // const relativePath = path.normalize(path.relative(destPath, sourcePath))
-  // console.log('relativePath:', relativePath)
-  //
-  // // 对相对路径进行拆分，去除前面的上级、上上级路径
-  // const pathArr = relativePath.split('\\').filter(item => item !== '..' && item !== '.')
-  // console.log('pathArr:', relativePath)
-  // pathArr.shift()
-  //
-  // // 重新组合返回目标路径
-  // return pathArr.join('/')
+  traverseDir(compileDirPath)
+
+  return dirPaths
 }
 
-// 方法 - 解析编译脚本的配置
+// 方法 - 解析插件可选项参数
 export const parseScriptPathsConfig = (scriptPaths: PluginScriptPaths): PluginScriptPathsConfig => {
   return scriptPaths.map(scriptPath => {
     // 单字符串形式
@@ -94,20 +91,53 @@ export const parseScriptPathsConfig = (scriptPaths: PluginScriptPaths): PluginSc
   })
 }
 
+// 方法 - 更新tsconfig文件
+const updateTsConfig = (updateRecord: Record<string, any>) => {
+  try {
+    const { outDir, include } = updateRecord
+
+    // 修改配置文件
+    originTsConfig.compilerOptions.outDir = outDir
+    originTsConfig.include = include
+
+    fs.writeFileSync(path.join(__dirname, './tsconfig.json'), JSON.stringify(originTsConfig, null, 2))
+    // fs.writeFileSync(path.join(__dirname, '../tsconfig.json'), JSON.stringify(originTsConfig, null, 2)) 本地开发环境
+  } catch (e: any) {
+    console.error('[vite-plugin-globEager-auto-declare] 使用tsc编译失败, error: 读取tsconfig配置文件失败')
+    throw new Error(e)
+  }
+}
+
 // 方法 - 使用tsc命令对项目进行编译进而得到声明文件
-export const execTscCommand = (compilePath: string) => {
+export const execTscCommand = (gScriptOptions: PluginScriptPathsConfig, COMPILE_DIR: string) => {
+  // 编译文件路径
+  const includeFiles = gScriptOptions
+    .map(item => item.path)
+    .map(item => {
+      return [
+        `${item.replace(/\\/g, '/')}/**/*.ts`,
+        `${item.replace(/\\/g, '/')}/**/*.d.ts`
+      ]
+    })
+    .flat()
+
+  // 更新tsconfig文件
+  updateTsConfig({
+    outDir: COMPILE_DIR.replace(/\\/g, '/'),
+    include: includeFiles
+  })
+
   return new Promise((resolve, reject) => {
     exec(
-      `tsc --declaration --emitDeclarationOnly --outDir ${compilePath}`,
+      `tsc -p ${path.join(__dirname, './tsconfig.json')}`,
+      // `tsc -p ${path.join(__dirname, '../tsconfig.json')}`, // 本地开发环境
       {},
       (err, stdout, stderr) => {
         if (stderr) {
-          console.error(
-            '[vite-plugin-globEager-auto-declare] 编译文件失败, error:',
-            JSON.stringify(stderr)
-          );
-          reject(stderr)
+          console.log(stderr)
+          return reject(stderr)
         }
+
         resolve(stdout)
       }
     )

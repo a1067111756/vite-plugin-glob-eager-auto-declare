@@ -1,12 +1,15 @@
 /* 解析声明文件相关 */
 import fs from 'fs'
 import path from 'path'
+import chalk from 'chalk'
 import { execSync } from 'child_process'
-import { vconsole, getExtraRelativePath, parseScriptPathsConfig } from './helper'
+import { vconsole, getCompileDirAllDirPaths, parseScriptPathsConfig } from './helper'
 import type { PluginOutPath, PluginScriptPathsConfig } from '#/index'
 
+let targetDeclareDir = {}
+
 // 方法 - 替换声明文件内容
-const formatDeclare = (content: string, importLibs: Array<string>, importDeclare: Array<string>) => {
+const formatDeclare = (content: string, importLibs: Array<string>, importDeclare: Array<string>, fileName: string) => {
   let temp = ''
 
   // 处理声明文件中引入的三方包
@@ -40,9 +43,9 @@ const formatDeclare = (content: string, importLibs: Array<string>, importDeclare
     if (matches && matches.length > 0) {
       const params =  matches[0].split(',')
       // 普通声明
-      const normalDeclarations: string[] = []
+      const normalDeclarations = []
       // 声明引用了其它声明
-      const singleDeclarations: string[] = []
+      const singleDeclarations = []
 
       params[1].trim().startsWith('{')
         ? normalDeclarations.push(params[1].trim().slice(1, -1))
@@ -66,19 +69,44 @@ const formatDeclare = (content: string, importLibs: Array<string>, importDeclare
     return '{ \n  };'
   }
 
-  // 如果声明的是枚举形式 -> 转换成键值对对象  export declare enum xxx {}; 转换为 xxx: {}
-  if (content.indexOf('export declare enum') !== -1) {
-    temp = content.replace(/export declare enum/g, '');
-    temp = temp.replace(/{/g, ':{');
-    temp = temp.replace(/=/g, ':');
-    return `{ \n ${temp}  };`;
+  // export default 文件唯一导出处理
+  if (content.indexOf('export default') !== -1) {
+    // 去除export default
+    content = content.replace( /^export default .+;?/gm, '');
+
+    // 去除declare const
+    if (content.includes('=>')) {
+      return content.replace(/[^:]*:/, '')
+    } else if (content.includes('=')) {
+      return content.replace(/[^=]*=/, '')
+    } else {
+      return content
+    }
   }
 
-  // 如果声明的是常量形式 -> 转换成键值对对象  export declare const xxx = "xxx"; 转换为 xxx: "xxx"
-  if (content.indexOf('=>') === -1 && content.indexOf('=') !== -1) {
-    temp = content.replace(/export declare const/g, '');
-    temp = temp.replace(/=/g, ':');
-    return `{ \n ${temp}  };`;
+  // 枚举形式处理 -> 转换成键值对对象  export declare enum xxx {} 转=>换 xxx: {}
+  if (content.indexOf('export declare enum') !== -1) {
+    content = content.replace(/export declare enum/g, '');
+    content = content.replace(/{/g, ':{');
+    content = content.replace(/=/g, ':');
+  }
+
+  // 常量形式处理 -> 转换成键值对对象
+  // export declare const xxx = "xxx" 转=>换 xxx: "xxx"
+  // export declare const xxx : () => void 转=>换 xxx: () => void
+  if (content.indexOf('export declare const') !== -1) {
+    const regex = /export declare const (\w+)([^=]*)(=.*)?;/g;
+    content = content.replace(regex, (match) => {
+      // 函数
+      if (match.includes('=>')) {
+        return match.replace('export declare const', '')
+      // 常量
+      } else if (match.includes('=')) {
+        return match.replace('export declare const', '').replace('=', ':')
+      } else {
+        return match
+      }
+    })
   }
 
   // 默认将“export declare const”替换为“”
@@ -108,7 +136,7 @@ const filterDeclareContent = (filePath: string, importLibs: Array<string>, impor
   // 1. 将文件名作为key, 2. 将内容中“export declare const”去除
   const fileName = filePath.slice(filePath.lastIndexOf('\\') + 1)
   const key = fileName.slice(0, -5)
-  const value = formatDeclare(content, importLibs, importDeclare)
+  const value = formatDeclare(content, importLibs, importDeclare, fileName)
   return `  ${key}: ${value.replace(/export\s*{\s*}\s*;/g, '')}`
 }
 
@@ -121,44 +149,29 @@ export const parseDeclare = (
   importLibs: Array<string>,
   importDeclare: Array<string>
 ) => {
-  vconsole.log('全局配置:')
+  vconsole.log(chalk.blue('全局配置:'))
   vconsole.log(`COMPILE_DIR: ${COMPILE_DIR}`)
   vconsole.log(`OUTPUT_PATH: ${OUTPUT_PATH}`)
 
-  vconsole.log('\n中间文件:')
+  vconsole.log(chalk.blue('\n中间文件:'))
   vconsole.log('gScriptPathConfigs:')
   vconsole.dir(gScriptPathConfigs)
 
-  // 从插件配置中读取目标声明目录列表
-  const targetDeclareDir = gScriptPathConfigs
-    // 筛除不存在的目录
-    .filter(item => {
-      if (!fs.existsSync(item.path)) {
-        vconsole.log(`${item.path}不存在跳过`)
-        return false
-      }
-      return true
-    })
-    // 遍历得到编译后目录
-    .map(item => {
-      const extraRelativePath = getExtraRelativePath(item.path, COMPILE_DIR)
-      return extraRelativePath
-          ? path.resolve(COMPILE_DIR, extraRelativePath)
-          : undefined
-    })
-    .filter(item => item)
+  // 遍历声明，查找出解析声明的目录列表
+  const compileDirAllDirPaths = getCompileDirAllDirPaths(COMPILE_DIR)
+  compileDirAllDirPaths.forEach(cPath => {
+    const match = gScriptPathConfigs.find(item => item.path.endsWith(cPath))
+    match && (targetDeclareDir[path.join(COMPILE_DIR, cPath)] = match)
+  })
 
   vconsole.log('targetDeclareDir:')
   vconsole.dir(targetDeclareDir)
 
-  const targetDeclareFiles: string[] = []
-
   // 遍历这些目录得到声明文件列表，并将声明文件进行过滤、替换操作
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  targetDeclareDir.forEach((targetDeclarePath: string, index: number) => {
+  const targetDeclareFiles: string[] = []
+  Object.keys(targetDeclareDir).forEach((targetDeclarePath: string) => {
     // 声明目录对应的配置
-    const { exclude, mountedName } = gScriptPathConfigs[index]
+    const { exclude, mountedName } = targetDeclareDir[targetDeclarePath]
 
     // 读取文件目录
     let declareTemplate = ''
@@ -167,8 +180,6 @@ export const parseDeclare = (
     declareFiles
       // 去除exclude排除的文件
       .filter(fileName => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         return !exclude.includes(fileName.replace(/\.d\.ts$/, '.ts'))
       })
       // 遍历文件解析
@@ -229,7 +240,7 @@ export const writeCompileContents = (
       fs.mkdirSync(path.join(outDeclarePath, '../'), { recursive: true });
     }
 
-    vconsole.log('\n最终编译内容:')
+    vconsole.log(chalk.blue('\n最终编译内容:'))
     fs.writeFileSync(outDeclarePath, '// 导出声明 \n', { encoding: 'utf-8', flag: 'w+' });
     fs.writeFileSync(outDeclarePath, exportTemplate, { encoding: 'utf-8', flag: 'a+' });
     vconsole.log('导出声明')
@@ -262,7 +273,7 @@ export const writeCompileContents = (
     return
   }
 
-  console.log(outDeclarePath)
+  vconsole.log(chalk.blue('声明输出地址: '), outDeclarePath)
   // 使用eslint格式化文件
   try {
     execSync(`prettier --config ${prettierrcPath} --write ${outDeclarePath}`);
@@ -270,5 +281,5 @@ export const writeCompileContents = (
     console.log('[vite-plugin-globEager-auto-declare] prettier格式化命令出错');
   }
 
-  console.log('[vite-plugin-globEager-auto-declare] 自动生成声明文件执行成功');
+  console.log(chalk.green('[vite-plugin-globEager-auto-declare] 自动生成声明文件执行成功'));
 }

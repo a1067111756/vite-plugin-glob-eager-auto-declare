@@ -8,10 +8,12 @@ import {PluginOptions, PluginOutPath, PluginScriptPathsConfig} from '#/index'
 let isCompiling = false
 
 // compile目录 - tsc编译后声明存放的地方
-const COMPILE_DIR = path.join(path.dirname(__filename), 'compile')
+const COMPILE_DIR = path.join(__dirname, './compile')
+// const COMPILE_DIR = path.join(__dirname, '../compile')  // 本地开发环境
 
 // prettierrc路径 - 样式格式化文件
-const PRETTIERRC_PATH = path.join(path.dirname(__filename), '.prettierrc')
+const PRETTIERRC_PATH = path.join(__dirname, './.prettierrc')
+// const COMPILE_DIR = path.join(__dirname, '../.prettierrc')  // 本地开发环境
 
 // 记录声明文件中引入的三方包(切记不用用相对路径引入，相对路径未处理)
 let importLibs: Array<string> = []
@@ -22,11 +24,12 @@ let importDeclare: Array<string> = []
 // 记录声明文件内容
 let compileContents: Array<string> = []
 
+
 // 方法 - 主流程
 // 1. 使用tsc编译项目得到声明文件 -> 2. 自定义解析对声明文件进行过滤、替换最终合并成一个文件 -> 3. 将文件输出到目标路径
 export const generateMain = async (gScriptPathConfigs: PluginScriptPathsConfig, gOutPath: PluginOutPath, gPluginOptions: PluginOptions) => {
   // 是否打开log日志
-  vconsole.setKeepLog(gPluginOptions.keepLog as boolean);
+  vconsole.setKeepLog(gPluginOptions.keepLog as boolean)
 
   // 表示正在编译中 - 直接返回
   if (isCompiling) return
@@ -40,9 +43,9 @@ export const generateMain = async (gScriptPathConfigs: PluginScriptPathsConfig, 
 
   // 1. 执行tsc编译，将编译后的声明文件放到compile目录下
   try {
-    await execTscCommand(COMPILE_DIR);
+    await execTscCommand(gScriptPathConfigs, COMPILE_DIR)
   } catch (e) {
-    console.error('[vite-plugin-globEager-auto-declare] 使用tsc编译失败, error:', e);
+    console.error('[vite-plugin-globEager-auto-declare] 使用tsc编译失败, error:', e)
     return
   }
 

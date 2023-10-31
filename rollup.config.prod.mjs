@@ -54,7 +54,7 @@ module.exports = {
   external: [],
   // 插件
   plugins: [
-    nodeResolve(), // 三方依赖打包
+    nodeResolve({ exportConditions: ['node'] }), // 三方依赖打包
     commonjs(), // 支持commonJs语法
     babel({ babelHelpers: 'bundled', }), // babel语法转义
     typescript({ sourceMap: false, tsconfig: './tsconfig.json' }), // 不生成sourceMap

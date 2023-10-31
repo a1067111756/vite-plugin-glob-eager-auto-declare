@@ -7,4 +7,7 @@ export const STORAGE_KEY_AUTH_TOKEN = 'auth_token'
 export const STORAGE_KEY_AUTH_USERINFO = 'auth_userinfo'
 
 // 用户账号密码
-export const STORAGE_KEY_AUTH_PAW = 'auth_pawssss'
+export const STORAGE_KEY_AUTH_PAW = 'auth_paw'
+
+// 用户账号密码
+export const STORAGE_KEY_LOCATION_TYPE = 'location_type'

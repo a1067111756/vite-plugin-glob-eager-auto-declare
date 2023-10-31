@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "es2020",
+    "allowJs": true,
+    "sourceMap": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+
+    "noEmit": false,
+    "jsx": "preserve",
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noImplicitAny": false,
+    "noUnusedParameters": true,
+    "ignoreDeprecations": "5.0",
+    "useDefineForClassFields": true,
+    "noFallthroughCasesInSwitch": true,
+    "suppressImplicitAnyIndexErrors": true,
+
+    "importHelpers": true,
+    "types": ["vite/client", "node"],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "outDir": ""
+  },
+  "include": [],
+  "exclude": ["E:/zyslsd/front-scaffold/web-template/node_modules"]
+}
