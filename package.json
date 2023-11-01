@@ -1,24 +1,24 @@
 {
   "name": "vite-plugin-glob-eager-auto-declare",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "author": "chengyu",
   "license": "MIT",
   "description": "automatically generate a claims file, mounted into vue global instance variables",
-  "main": "./dist/bundle.min.umd.js",
-  "module": "./dist/bundle.min.es.js",
-  "types": "./dist/types/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/bundle.min.es.js",
-      "require": "./dist/bundle.min.umd.js"
-    }
-  },
+  "main": "dist/bundle.min.cjs",
+  "module": "dist/bundle.min.mjs",
+  "types": "dist/types/index.d.ts",
   "files": [
     "dist"
   ],
-  "keywords": ["vite", "glob", "glob-eager", "declare"],
+  "keywords": [
+    "vite",
+    "glob",
+    "glob-eager",
+    "declare"
+  ],
+  "type": "module",
   "scripts": {
-    "build": "rollup -c rollup.config.prod.mjs --bundleConfigAsCjs && node ./types-excutor.mjs",
+    "build": "rollup -c rollup.config.prod.js && node ./types-excutor.mjs",
     "ts:check": "tsc --noEmit -p ./tsconfig.json",
     "lint:check": "eslint --ext .js,.ts,.vue,.jsx,.tsx src",
     "lint:fix": "eslint --fix --ext .js,.ts,.vue,.jsx,.tsx src"
@@ -44,6 +44,7 @@
     "postcss": "^8.4.23",
     "prettier": "^2.8.8",
     "rollup": "^3.21.6",
+    "rollup-plugin-polyfill-node": "^0.12.0",
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-visualizer": "^5.9.0",
     "ts-node": "^10.9.1",

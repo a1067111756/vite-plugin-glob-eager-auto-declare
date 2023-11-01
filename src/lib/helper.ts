@@ -4,6 +4,9 @@ import path from 'path'
 import originTsConfig from '../tsconfigOrigin.json'
 import { exec } from 'child_process'
 import type { PluginScriptPaths, PluginScriptPathsConfig } from '../types/index'
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 interface VConsole {
   keepLog: boolean

@@ -2,7 +2,10 @@
 import path from 'path'
 import { parseDeclare, writeCompileContents } from './parse'
 import { removeDir, execTscCommand, vconsole } from './helper'
-import {PluginOptions, PluginOutPath, PluginScriptPathsConfig} from '../types/index'
+import { PluginOptions, PluginOutPath, PluginScriptPathsConfig } from '../types/index'
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 // 全局属性 - 标记当前是否在编译进程中，目的时防止频繁触发
 let isCompiling = false

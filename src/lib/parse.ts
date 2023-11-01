@@ -5,7 +5,7 @@ import chalk from 'chalk'
 import { execSync } from 'child_process'
 import { vconsole, getCompileDirAllDirPaths, parseScriptPathsConfig } from './helper'
 import type { PluginOutPath, PluginScriptPathsConfig } from '../types/index'
-``
+
 const targetDeclareDir = {}
 
 // 方法 - 替换声明文件内容
