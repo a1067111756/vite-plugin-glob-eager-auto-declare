@@ -1,7 +1,7 @@
+import { Plugin } from 'vite'
+
 // 默认导出
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-declare function GlobEagerAutoDeclarePlugin(scriptPaths: PluginScriptPaths, outPath?: PluginOutPath, pluginOptions?: PluginOptions): Plugin_2;
+declare function GlobEagerAutoDeclarePlugin(scriptPaths: PluginScriptPaths, outPath?: PluginOutPath, pluginOptions?: PluginOptions): Plugin;
 export default GlobEagerAutoDeclarePlugin;
 
 // 插件编译脚本路径

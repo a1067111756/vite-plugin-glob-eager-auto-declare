@@ -226,16 +226,18 @@ GlobEagerAutoDeclarePlugin(
     import { request } from '@/common/plugins/requestPlugin'
 
     // 登录
-    export const login = (loginVO: API.ILoginVO): API.ILoginDTO => request({
-      url: '/user/login',
-      data: loginVO
-    })
+    export const login = 
+        (loginVO: API.ILoginVO): API.ILoginDTO => request({
+          url: '/user/login',
+          data: loginVO
+        })
     
     // 登出
-    export const logout = (logoutVO: API.ILogoutVO): API.ILogoutDTO => request({
-      url: '/user/logout',
-      data: logoutVO
-    })
+    export const logout = 
+        (logoutVO: API.ILogoutVO): API.ILogoutDTO => request({
+          url: '/user/logout',
+          data: logoutVO
+        })
 
     ----------------------------------------------------------------
     // xxx.vue

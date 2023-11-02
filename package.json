@@ -1,21 +1,30 @@
 {
   "name": "vite-plugin-glob-eager-auto-declare",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": "chengyu",
   "license": "MIT",
   "description": "automatically generate a claims file, mounted into vue global instance variables",
   "main": "dist/bundle.min.cjs",
   "module": "dist/bundle.min.mjs",
   "types": "dist/types/index.d.ts",
-  "files": [
-    "dist"
-  ],
+  "exports": {
+    ".": {
+      "import": "./dist/bundle.min.mjs",
+      "require": "./dist/bundle.min.cjs",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
+  "files": ["dist"],
   "keywords": [
     "vite",
     "glob",
     "glob-eager",
     "declare"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/a1067111756/vite-plugin-glob-eager-auto-declare.git"
+  },
   "type": "module",
   "scripts": {
     "build": "rollup -c rollup.config.prod.js && node ./types-excutor.mjs",
@@ -48,6 +57,7 @@
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-visualizer": "^5.9.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "vite": "^4.5.0"
   }
 }

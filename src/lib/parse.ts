@@ -206,8 +206,7 @@ export const writeCompileContents = (
   gScriptPathConfigs: PluginScriptPathsConfig,
   compileContents: Array<string>,
   importLibs: Array<string>,
-  importDeclare: Array<string>,
-  prettierrcPath: string
+  importDeclare: Array<string>
 ) => {
   try {
     // 导出声明
@@ -274,12 +273,4 @@ export const writeCompileContents = (
   }
 
   vconsole.log(chalk.blue('声明输出地址: '), outDeclarePath)
-  // 使用eslint格式化文件
-  try {
-    execSync(`prettier --config ${prettierrcPath} --write ${outDeclarePath}`);
-  } catch (e) {
-    console.log('[vite-plugin-globEager-auto-declare] prettier格式化命令出错');
-  }
-
-  console.log(chalk.green('[vite-plugin-globEager-auto-declare] 自动生成声明文件执行成功'));
 }

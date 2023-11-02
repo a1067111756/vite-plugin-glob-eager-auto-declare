@@ -5,6 +5,8 @@ import { removeDir, execTscCommand, vconsole } from './helper'
 import { PluginOptions, PluginOutPath, PluginScriptPathsConfig } from '../types/index'
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
+import { execSync } from 'child_process'
+import chalk from 'chalk'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 // 全局属性 - 标记当前是否在编译进程中，目的时防止频繁触发
@@ -56,9 +58,20 @@ export const generateMain = async (gScriptPathConfigs: PluginScriptPathsConfig, 
   parseDeclare(COMPILE_DIR, gOutPath, gScriptPathConfigs, compileContents, importLibs, importDeclare)
 
   // 3. 将声明文件写入目标地址
-  writeCompileContents(gOutPath, gScriptPathConfigs, compileContents, importLibs, importDeclare, PRETTIERRC_PATH)
+  writeCompileContents(gOutPath, gScriptPathConfigs, compileContents, importLibs, importDeclare)
 
-  // 删除中间目录
+  // 4. 使用eslint格式化文件
+  try {
+    console.log(PRETTIERRC_PATH)
+    console.log(gOutPath)
+    execSync(`prettier --config ${PRETTIERRC_PATH} --write ${gOutPath}`);
+  } catch (e) {
+    console.log('sssssss')
+    console.log(e)
+    console.log('[vite-plugin-globEager-auto-declare] prettier格式化命令出错');
+  }
+
+  // 5. 删除中间目录
   if (!gPluginOptions.keepCompile) {
     try {
       removeDir(COMPILE_DIR)
@@ -70,6 +83,8 @@ export const generateMain = async (gScriptPathConfigs: PluginScriptPathsConfig, 
       return
     }
   }
+
+  console.log(chalk.green('[vite-plugin-globEager-auto-declare] 自动生成声明文件执行成功'));
 
   isCompiling = false
 }
