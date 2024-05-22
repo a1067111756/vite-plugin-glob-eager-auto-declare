@@ -11,6 +11,7 @@ let gOutPath  = ''
 
 // 插件全局选项
 let gPluginOptions: PluginOptions = {
+  target: 'vue',
   keepLog: false,
   keepCompile: false
 }
@@ -28,8 +29,13 @@ export default function VitePluginGlobDeclare(scriptPaths: PluginScriptPaths, ou
       }
 
       gScriptPathConfigs = parseScriptPathsConfig(scriptPaths)
-      gOutPath = path.join(outPath, 'vue-property-extends.d.ts')
       gPluginOptions = Object.assign({}, gPluginOptions, pluginOptions)
+
+      if (gPluginOptions.target === 'uni') {
+        gOutPath = path.join(outPath, 'uni-property-extend.d.ts')
+      } else {
+        gOutPath = path.join(outPath, 'vue-property-extend.d.ts')
+      }
     },
     // 热更新
     handleHotUpdate({ file }: { file: string }) {

@@ -58,7 +58,7 @@ export const generateMain = async (gScriptPathConfigs: PluginScriptPathsConfig, 
   parseDeclare(COMPILE_DIR, gOutPath, gScriptPathConfigs, compileContents, importLibs, importDeclare)
 
   // 3. 将声明文件写入目标地址
-  writeCompileContents(gOutPath, gScriptPathConfigs, compileContents, importLibs, importDeclare)
+  writeCompileContents(gOutPath, gScriptPathConfigs, gPluginOptions, compileContents, importLibs, importDeclare)
 
   // 4. 使用eslint格式化文件
   try {

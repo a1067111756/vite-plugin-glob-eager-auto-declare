@@ -19,6 +19,8 @@ export type PluginOutPath = string
 
 // 插件全局选项
 export type PluginOptions = {
+  // 输入目标类型
+  target: 'vue' | 'uni',
   // 是否输出打印
   keepLog?: boolean,
   // 是否保留编译目录

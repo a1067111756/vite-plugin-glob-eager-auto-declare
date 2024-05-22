@@ -2,9 +2,8 @@
 import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
-import { execSync } from 'child_process'
 import { vconsole, getCompileDirAllDirPaths, parseScriptPathsConfig } from './helper'
-import type { PluginOutPath, PluginScriptPathsConfig } from '../types/index'
+import type { PluginOptions, PluginOutPath, PluginScriptPathsConfig } from '../types/index'
 
 const targetDeclareDir = {}
 
@@ -204,6 +203,7 @@ export const parseDeclare = (
 export const writeCompileContents = (
   outDeclarePath: PluginOutPath,
   gScriptPathConfigs: PluginScriptPathsConfig,
+  gPluginOptions: PluginOptions,
   compileContents: Array<string>,
   importLibs: Array<string>,
   importDeclare: Array<string>
@@ -226,9 +226,18 @@ export const writeCompileContents = (
         template = template + `$${mountedName}: I${mountedName.toUpperCase()}Declare;\n      `;
       })
 
-      return `declare module '@vue/runtime-core' { 
-              interface ComponentCustomProperties { 
-                ${template} 
+      if (gPluginOptions.target === 'uni') {
+        return `declare global {
+              interface Uni extends _Uni {
+                ${template}
+              }
+            }
+          `
+      }
+
+      return `declare module '@vue/runtime-core' {
+              interface ComponentCustomProperties {
+                ${template}
               }
             }
           `

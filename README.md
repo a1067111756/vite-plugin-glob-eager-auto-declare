@@ -80,10 +80,12 @@ GlobEagerAutoDeclarePlugin(
   path.resolve(__dirname, 'types'),
   // 第三个参数是object，插件相关注入选项
   {
+    // 插件编译的目标
+    target?: 'vue', // 此处暂时只支持vue、uni，
     // 是否打开编译日志 - 用于调试查看编译异常很有帮助
-    keepLog: true,
+    keepLog?: true,
     // 是否保留编译声明中间文件 - 用于调试查看tsc编译后的原始声明
-    keepCompiler: false
+    keepCompiler?: false
   }
 )
 ```
@@ -379,4 +381,9 @@ GlobEagerAutoDeclarePlugin(
        appInstance.$constant.enum.ACCOUNT_LEVEL.CITY
     </script>
 ```
+
+### 六、更新记录
+    v0.0.7:
+      1. 支持uni-app中使用  
+
 
