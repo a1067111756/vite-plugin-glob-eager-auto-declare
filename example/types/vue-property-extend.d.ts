@@ -149,7 +149,7 @@ interface ISTOREDeclare {
   example: {
     getDoubleCount(): number
 
-    setCount(): void
+    setCount(count: number): void
   } & ExampleState
 }
 

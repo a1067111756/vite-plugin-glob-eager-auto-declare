@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import path from 'path'
-import GlobEagerAutoDeclarePlugin from '../dist/bundle.min.es'
+import GlobEagerAutoDeclarePlugin from '../dist/bundle.min.mjs'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -20,8 +20,9 @@ export default defineConfig({
         ],
         path.resolve(__dirname, 'types'),
         {
-          keepLog: true,
-          keepCompiler: false
+          keepLog: false,
+          keepCompile: true,
+          nodeModulesLibs: ['pinia-plugin-persistedstate']
         }
     )
   ]

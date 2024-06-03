@@ -85,7 +85,11 @@ GlobEagerAutoDeclarePlugin(
     // 是否打开编译日志 - 用于调试查看编译异常很有帮助
     keepLog?: true,
     // 是否保留编译声明中间文件 - 用于调试查看tsc编译后的原始声明
-    keepCompiler?: false
+    keepCompile?: false,
+    // 编译需要参加的三方依赖包
+    // 有时tsc在编译时如果文件引用了node_modules中的全局三方包，
+    // 没有显示的import会导致编译出的声明文件为空。eg: 'pinia-plugin-persistedstate'
+    nodeModulesLibs?: []
   }
 )
 ```
@@ -385,5 +389,11 @@ GlobEagerAutoDeclarePlugin(
 ### 六、更新记录
     v0.0.7:
       1. 支持uni-app中使用  
+
+    v0.0.8:
+      1. 解决编译中隐式引用node_modules三方包导致编译结果不正确问题 
+           实际案例是pinia-plugin-persistedstate这个包，它的声明是在
+         pinia基础上加上persist选项，全局声明的，在写store时不需要导
+         入，这个导致tsc编译时找不到这个声明，导致编译结果不正确
 
 

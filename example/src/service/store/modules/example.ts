@@ -12,11 +12,12 @@ export const useExampleStore = defineStore({
   getters: {
     getDoubleCount(): number {
       return this.count * 2
-		}	
+		}
   },
 	actions: {
-		setCount(): void {
-			this.count = this.count + 1
+		setCount(count: number): void {
+			this.count = count
 		}
-	}
+	},
+  persist: true
 })

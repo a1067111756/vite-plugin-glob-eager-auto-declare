@@ -24,7 +24,9 @@ export type PluginOptions = {
   // 是否输出打印
   keepLog?: boolean,
   // 是否保留编译目录
-  keepCompile?: boolean
+  keepCompile?: boolean,
+  // 编译需要参加的三方依赖包
+  nodeModulesLibs?: Array<string>
 }
 
 // 插件编译脚本配置

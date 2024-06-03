@@ -48,7 +48,7 @@ export const generateMain = async (gScriptPathConfigs: PluginScriptPathsConfig, 
 
   // 1. 执行tsc编译，将编译后的声明文件放到compile目录下
   try {
-    await execTscCommand(gScriptPathConfigs, COMPILE_DIR)
+    await execTscCommand(gPluginOptions, gScriptPathConfigs, COMPILE_DIR)
   } catch (e) {
     console.error('[vite-plugin-globEager-auto-declare] 使用tsc编译失败, error:', e)
     return
@@ -62,12 +62,9 @@ export const generateMain = async (gScriptPathConfigs: PluginScriptPathsConfig, 
 
   // 4. 使用eslint格式化文件
   try {
-    console.log(PRETTIERRC_PATH)
     console.log(gOutPath)
     execSync(`prettier --config ${PRETTIERRC_PATH} --write ${gOutPath}`);
   } catch (e) {
-    console.log('sssssss')
-    console.log(e)
     console.log('[vite-plugin-globEager-auto-declare] prettier格式化命令出错');
   }
 

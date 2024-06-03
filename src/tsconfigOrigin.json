@@ -24,12 +24,11 @@
     "useDefineForClassFields": true,
     "noFallthroughCasesInSwitch": true,
     "suppressImplicitAnyIndexErrors": true,
-
     "importHelpers": true,
     "types": ["vite/client", "node"],
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "outDir": ""
   },
   "include": [],
-  "exclude": ["E:/zyslsd/front-scaffold/web-template/node_modules"]
+  "exclude": []
 }

@@ -13,7 +13,8 @@ let gOutPath  = ''
 let gPluginOptions: PluginOptions = {
   target: 'vue',
   keepLog: false,
-  keepCompile: false
+  keepCompile: false,
+  nodeModulesLibs: []
 }
 
 // 插件注册

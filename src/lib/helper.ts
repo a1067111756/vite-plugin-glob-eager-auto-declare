@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import originTsConfig from '../tsconfigOrigin.json'
 import { exec } from 'child_process'
-import type { PluginScriptPaths, PluginScriptPathsConfig } from '../types/index'
+import { PluginOptions, PluginScriptPaths, PluginScriptPathsConfig } from '../types/index'
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -112,7 +112,7 @@ const updateTsConfig = (updateRecord: Record<string, any>) => {
 }
 
 // 方法 - 使用tsc命令对项目进行编译进而得到声明文件
-export const execTscCommand = (gScriptOptions: PluginScriptPathsConfig, COMPILE_DIR: string) => {
+export const execTscCommand = (gPluginOptions: PluginOptions, gScriptOptions: PluginScriptPathsConfig, COMPILE_DIR: string) => {
   // 编译文件路径
   const includeFiles = gScriptOptions
     .map(item => item.path)
@@ -124,10 +124,16 @@ export const execTscCommand = (gScriptOptions: PluginScriptPathsConfig, COMPILE_
     })
     .flat()
 
+  // 参与的编译三方库
+  const includeLibs = gPluginOptions.nodeModulesLibs!.map(item => {
+    return path.resolve('./', 'node_modules', item).replace(/\\/g, '/')
+  })
+
   // 更新tsconfig文件
+  console.log(path.resolve('./'))
   updateTsConfig({
     outDir: COMPILE_DIR.replace(/\\/g, '/'),
-    include: includeFiles
+    include: [...includeFiles, ...includeLibs],
   })
 
   return new Promise((resolve, reject) => {
