@@ -14,7 +14,7 @@ let gPluginOptions: PluginOptions = {
   target: 'vue',
   keepLog: false,
   keepCompile: false,
-  nodeModulesLibs: []
+  include: []
 }
 
 // 插件注册

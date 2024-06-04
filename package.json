@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-glob-eager-auto-declare",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "author": "chengyu",
   "license": "MIT",
   "description": "automatically generate a claims file, mounted into vue global instance variables",
@@ -14,7 +14,9 @@
       "types": "./dist/types/index.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "vite",
     "glob",

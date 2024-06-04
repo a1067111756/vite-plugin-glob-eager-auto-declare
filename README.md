@@ -1,7 +1,8 @@
 # 🚀 vite-plugin-glob-eager-auto-declare
 
-> 🔥 vite插件 - 自动扫描生成声明文件挂载到vue ComponentCustomProperties全局属性扩展
-
+> 🔥 vite插件 - 自动扫描指定文件生成声明文件挂载到vue ComponentCustomProperties全局属性扩展
+（通熟的讲就是你搞了一些自动化注册，挂载了很多全局属性在实例上，又懒的自己去写这些声明，又想编辑器
+有代码提示，这个插件就是帮你做这些的）
 ### 一、插件的背景和目标
 ___
 - 背景 - 开发业务时，虽然在用vue3，但是习惯vue2的this写法，将全局相关的配置挂载到实例上
@@ -33,7 +34,7 @@ import GlobEagerAutoDeclarePlugin from 'vite-plugin-glob-eager-auto-declare'
 export default defineConfig({
   plugins: [
     GlobEagerAutoDeclarePlugin(
-      // 注册扫描的文件
+      // 注册扫描的文件目录
       [
         path.resolve(__dirname, 'src/service/constant'),
         path.resolve(__dirname, 'src/common/properties'),
@@ -86,10 +87,9 @@ GlobEagerAutoDeclarePlugin(
     keepLog?: true,
     // 是否保留编译声明中间文件 - 用于调试查看tsc编译后的原始声明
     keepCompile?: false,
-    // 编译需要参加的三方依赖包
-    // 有时tsc在编译时如果文件引用了node_modules中的全局三方包，
-    // 没有显示的import会导致编译出的声明文件为空。eg: 'pinia-plugin-persistedstate'
-    nodeModulesLibs?: []
+    // 编译需要参加的额外依赖 - 详细解释请看下方更新记录v0.0.9
+    // 请使用绝对路径，path.resolve(__dirname, 'xxx')
+    include?: []
   }
 )
 ```
@@ -388,12 +388,42 @@ GlobEagerAutoDeclarePlugin(
 
 ### 六、更新记录
     v0.0.7:
-      1. 支持uni-app中使用  
-
+      1. 支持uni-app中使用, 将编译的声明挂载到uni对象上，而不是vue实例  
+         GlobEagerAutoDeclarePlugin(
+           // 注册编译文件路径
+           ['xxx'] 
+           // 声明输出路径
+           'xxx',
+           // 插件选项
+           {
+             type: 'uni'
+           }  
+          )
     v0.0.8:
-      1. 解决编译中隐式引用node_modules三方包导致编译结果不正确问题 
-           实际案例是pinia-plugin-persistedstate这个包，它的声明是在
-         pinia基础上加上persist选项，全局声明的，在写store时不需要导
-         入，这个导致tsc编译时找不到这个声明，导致编译结果不正确
+      1. 解决编译中缺少全局声明导致编译结果不正确问题 
+        原因：这个问题是在使用pinia-plugin-persistedstate这个包时发现的，
+        pinia-plugin-persistedstate是通过declare module 'pinia'
+        来扩展pinia的声明，它是个全局的声明，不需要在文件在引入。问题
+        在于该插件由于效率问题采用的方案是只编译用户指定注册的文件的声
+        明，如果每次都编译整个工程效率会很低。这些全局声明通常是不会显
+        式被引入的，这会导致tsc编译出来的声明简化、缺失甚至异常。
+        
+        解决方案：插件配置项中添加了include选项，由用户自定义配置哪些
+        声明需要参与到编译过程。
+           GlobEagerAutoDeclarePlugin(
+            // 注册编译文件路径
+            ['xxx'] 
+            // 声明输出路径
+            'xxx',
+            // 插件选项
+            {
+               include: [
+                 path.resolve(
+                  __dirname, 
+                  'node_modules/pinia-plugin-persistedstate'
+                 )
+               ]
+            }
+          )
 
 

@@ -124,16 +124,15 @@ export const execTscCommand = (gPluginOptions: PluginOptions, gScriptOptions: Pl
     })
     .flat()
 
-  // 参与的编译三方库
-  const includeLibs = gPluginOptions.nodeModulesLibs!.map(item => {
-    return path.resolve('./', 'node_modules', item).replace(/\\/g, '/')
+  // 编译需要参与的依赖
+  const includeDependence = gPluginOptions.include!.map(item => {
+    return item.replace(/\\/g, '/')
   })
 
   // 更新tsconfig文件
-  console.log(path.resolve('./'))
   updateTsConfig({
     outDir: COMPILE_DIR.replace(/\\/g, '/'),
-    include: [...includeFiles, ...includeLibs],
+    include: [...includeFiles, ...includeDependence]
   })
 
   return new Promise((resolve, reject) => {
