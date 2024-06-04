@@ -226,21 +226,42 @@ export const writeCompileContents = (
         template = template + `$${mountedName}: I${mountedName.toUpperCase()}Declare;\n      `;
       })
 
-      if (gPluginOptions.target === 'uni') {
-        return `declare global {
-              interface Uni extends _Uni {
-                ${template}
-              }
+      // 输出目标
+      const target = Array.isArray(gPluginOptions.target) ? gPluginOptions.target : [gPluginOptions.target]
+      // 输出模板
+      let outTemplate = ''
+
+      // uni
+      if (target.includes('uni')) {
+        outTemplate = outTemplate +
+          `declare global {
+            interface Uni extends _Uni {
+              ${template}
             }
-          `
+          }`
       }
 
-      return `declare module '@vue/runtime-core' {
-              interface ComponentCustomProperties {
-                ${template}
-              }
+      // vue
+      if (target.includes('vue')) {
+        outTemplate = outTemplate +
+          `declare module '@vue/runtime-core' {
+            interface ComponentCustomProperties {
+              ${template}
             }
-          `
+          }`
+      }
+
+      // 防范错误值
+      if (!outTemplate) {
+        outTemplate = outTemplate +
+          `declare module '@vue/runtime-core' {
+            interface ComponentCustomProperties {
+              ${template}
+            }
+          }`
+      }
+
+      return outTemplate
     }
 
     // 输出路径不存在，自动创建

@@ -32,8 +32,9 @@ export default function VitePluginGlobDeclare(scriptPaths: PluginScriptPaths, ou
       gScriptPathConfigs = parseScriptPathsConfig(scriptPaths)
       gPluginOptions = Object.assign({}, gPluginOptions, pluginOptions)
 
-      if (gPluginOptions.target === 'uni') {
-        gOutPath = path.join(outPath, 'uni-property-extend.d.ts')
+      const targetArray = Array.isArray(gPluginOptions.target) ? gPluginOptions.target : [gPluginOptions.target]
+      if (targetArray.length >= 0) {
+        gOutPath = path.join(outPath, `${targetArray[0]}-property-extend.d.ts`)
       } else {
         gOutPath = path.join(outPath, 'vue-property-extend.d.ts')
       }

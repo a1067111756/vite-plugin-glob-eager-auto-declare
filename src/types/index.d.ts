@@ -18,9 +18,10 @@ export type PluginScriptPaths = Array<string | {
 export type PluginOutPath = string
 
 // 插件全局选项
+type TargetElement = 'vue' | 'uni';
 export type PluginOptions = {
   // 输入目标类型
-  target: 'vue' | 'uni',
+  target: TargetElement | [TargetElement, ...TargetElement[]],
   // 是否输出打印
   keepLog?: boolean,
   // 是否保留编译目录

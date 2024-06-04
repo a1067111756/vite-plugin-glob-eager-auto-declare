@@ -82,7 +82,9 @@ GlobEagerAutoDeclarePlugin(
   // 第三个参数是object，插件相关注入选项
   {
     // 插件编译的目标
-    target?: 'vue', // 此处暂时只支持vue、uni，
+    // 此处暂时只支持vue、uni
+    // 'vue', 'uni', ['uni', 'vue']都是合法值
+    target?: 'vue', 
     // 是否打开编译日志 - 用于调试查看编译异常很有帮助
     keepLog?: true,
     // 是否保留编译声明中间文件 - 用于调试查看tsc编译后的原始声明
